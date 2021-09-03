@@ -2,48 +2,40 @@ use std::collections::HashSet;
 
 //"iterative" approach
 pub fn anagrams_for<'a>(word: &str, possible_anagrams: &[& 'a str]) -> HashSet<&'a str> {
-    let mut hs = HashSet::new();
+    //get lowercase and sorted version of original word once and reuse it
+    let word_lowercase = word.to_lowercase();
+    let mut word_charvec: Vec<char> = word_lowercase.chars().collect();
+    word_charvec.sort_unstable();
+    let word_sorted: String = word_charvec.iter().collect();
+    //construct hashset for our results
+    let mut retval = HashSet::new();
     for anagram_candidate in possible_anagrams.iter() {
-        if check_anagram(word, anagram_candidate) {
-            hs.insert(*anagram_candidate);
+        if check_anagram(word_lowercase.as_str(), word_sorted.as_str(), anagram_candidate) {
+            retval.insert(*anagram_candidate);
         }
     }
 
-    return hs;
+    return retval;
 }
 
-fn check_anagram(w1: &str, w2: &str) -> bool {
+fn check_anagram(word_lc: &str, word_sorted: &str, candidate: &str) -> bool {
     //anagrams must be the same length
-    if w1.len() != w2.len() {
+    if word_lc.len() != candidate.len() {
+        return false;
+    }
+    let candidate_lc = candidate.to_lowercase();
+
+    //if the char vectors are identical here before sorting, that means the supplied words are identical
+    //it is therefore not an anagram as per exercise description
+    if word_lc == candidate_lc {
         return false;
     }
 
-    //get char vectors of both words
-    let mut w1_chars: Vec<char> = string_lowercase(w1).chars().collect();
-    let mut w2_chars: Vec<char> = string_lowercase(w2).chars().collect();
-    //if they are the same before sorting, they are already sorted, which means they are the same
-    if w1_chars == w2_chars {
-        return false;
-    }
-    //sort the vectors alphabetically
-    w1_chars.sort_by(|a, b| b.cmp(a));
-    w2_chars.sort_by(|a, b| b.cmp(a));
+    let mut candidate_chars: Vec<char> = candidate_lc.chars().collect();
+    candidate_chars.sort_unstable();
+    //collect char vector back into string
+    let candidate_sorted: String = candidate_chars.iter().collect();
 
-    //if the vectors are equal, its an anagram
-    return w1_chars==w2_chars;
-}
-
-
-//"borrowed" functions below from https://exercism.io/tracks/rust/exercises/anagram/solutions/3cd55872b53048ecb3756daca3a877ae
-//returns the lowercase version of a string
-fn string_lowercase(str: &str) -> String {
-    //collect chars from string into slice, map every char to its lowercase version, collect back into string
-    str.chars().map(|c| char_lowercase(c)).collect()
-}
-
-//returns the lowercase version of a char
-fn char_lowercase(c: char) -> char {
-    //to_lowercase returns an iterator, so get next and unwrap value from it
-    //we ignore when chars have a lowercase representation of more than one char
-    c.to_lowercase().next().unwrap()
+    //if the sorted strings are equal, its an anagram
+    word_sorted == candidate_sorted
 }
