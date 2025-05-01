@@ -1,12 +1,3 @@
-// Diffie-Hellman-Merkle key exchange
-//
-// Step 1:   PrivateKey(p *big.Int) *big.Int
-// Step 2:   PublicKey(private, p *big.Int, g int64) *big.Int
-// Step 2.1: NewPair(p *big.Int, g int64) (private, public *big.Int)
-// Step 3:   SecretKey(private1, public2, p *big.Int) *big.Int
-//
-// Private keys should be generated randomly.
-
 package diffiehellman
 
 import (
@@ -159,24 +150,36 @@ func TestNewPair(t *testing.T) {
 }
 
 func BenchmarkPrivateKey(b *testing.B) {
+	if testing.Short() {
+		b.Skip("skipping benchmark in short mode.")
+	}
 	for i := 0; i < b.N; i++ {
 		PrivateKey(biggerTest.p)
 	}
 }
 
 func BenchmarkPublicKey(b *testing.B) {
+	if testing.Short() {
+		b.Skip("skipping benchmark in short mode.")
+	}
 	for i := 0; i < b.N; i++ {
 		PublicKey(biggerTest.a, biggerTest.p, biggerTest.g)
 	}
 }
 
 func BenchmarkNewPair(b *testing.B) {
+	if testing.Short() {
+		b.Skip("skipping benchmark in short mode.")
+	}
 	for i := 0; i < b.N; i++ {
 		NewPair(biggerTest.p, biggerTest.g)
 	}
 }
 
 func BenchmarkSecretKey(b *testing.B) {
+	if testing.Short() {
+		b.Skip("skipping benchmark in short mode.")
+	}
 	for i := 0; i < b.N; i++ {
 		SecretKey(biggerTest.a, biggerTest.B, biggerTest.p)
 	}
